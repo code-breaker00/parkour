@@ -1,6 +1,16 @@
+from panda3d.core import *
+from panda3d.core import loadPrcFileData
+
+# Fix pour Panda3D : forcer le bon affichage
+loadPrcFileData('', 'load-display pandagl')
+loadPrcFileData('', 'win-size 1280 720')
+loadPrcFileData('', 'fullscreen 0')
+loadPrcFileData('', 'window-title Parkour Infini')
+
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
+import webbrowser
 
 app = Ursina()
 window.title = "Parkour Infini"
@@ -8,6 +18,7 @@ window.color = color.rgb(160, 210, 255)  # Bleu ciel clair
 window.borderless = False
 window.fullscreen = False
 
+credits_panel = None
 player = None
 death_screen = None
 menu_panel = None
@@ -25,8 +36,10 @@ def create_main_menu():
     menu_panel = Entity(parent=camera.ui, enabled=True)
     Panel(scale=(0.6, 0.6), color=color.rgba(0, 0, 0, 180), parent=menu_panel)
     Text("Parkour Infini", parent=menu_panel, y=0.2, scale=2, origin=(0, 0), color=color.azure)
-    Button(text="JOUER", parent=menu_panel, scale=(0.3, 0.1), y=0.05, on_click=start_game)
-    Button(text="QUITTER", parent=menu_panel, scale=(0.3, 0.1), y=-0.1, on_click=application.quit)
+    Button(text="JOUER", parent=menu_panel, scale=(0.3, 0.1), y=0.1, on_click=start_game)
+    Button(text="CRÉDITS", parent=menu_panel, scale=(0.3, 0.1), y=-0.05, on_click=show_credits)
+    Button(text="QUITTER", parent=menu_panel, scale=(0.3, 0.1), y=-0.2, on_click=application.quit)
+
 
 def create_death_screen():
     global death_screen
@@ -37,6 +50,50 @@ def create_death_screen():
 
 score_text = Text("Niveau : 0", position=(-0.85, 0.45), scale=1.5, color=color.black)  # Texte noir
 author_text = Text("created by code_breaker", position=(-0.85, 0.40), scale=1, color=color.black)
+
+def hide_credits():
+    global credits_panel
+    if credits_panel:
+        destroy(credits_panel)
+    menu_panel.enabled = True
+
+
+def show_credits():
+    global credits_panel
+    menu_panel.enabled = False
+
+    credits_panel = Entity(parent=camera.ui)
+    Panel(scale=(0.6, 0.6), color=color.rgba(0, 0, 0, 180), parent=credits_panel)
+
+    Text("Crédits", parent=credits_panel, y=0.2, scale=2, origin=(0, 0), color=color.azure)
+    Text(text="mes reseaux", parent=credits_panel, y=0.10, scale=1.2, origin=(0, 0), color=color.white)
+    Button(
+        text="https://guns.lol/code_breaker",
+        parent=credits_panel,
+        y=0.05,
+        scale=(0.5, 0.05),
+        on_click=lambda: webbrowser.open("https://guns.lol/code_breaker")
+    )
+
+    Text(text="mon github", parent=credits_panel, y=-0.05, scale=1.2, origin=(0, 0), color=color.white)
+
+    Button(
+        text="https://github.com/code_breaker00",
+        parent=credits_panel,
+        y=-0.12,
+        scale=(0.5, 0.05),
+        on_click=lambda: webbrowser.open("https://github.com/code-breaker00")
+    )
+
+    Text("discord : code_breaker0", parent=credits_panel, y=-0.22, scale=1.1, origin=(0, 0), color=color.white)
+
+    Button(
+        text="RETOUR",
+        parent=credits_panel,
+        y=-0.35,
+        scale=(0.3, 0.07),
+        on_click=hide_credits
+    )
 
 
 # ========== LOGIQUE ==========
